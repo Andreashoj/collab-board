@@ -7,7 +7,4 @@ type User struct {
 	Name      string
 	Email     string `gorm:"unique"`
 	CreatedAt time.Time
-
-	GroupID uint
-	Group   *Group `gorm:"foreignKey:GroupID"`
 }

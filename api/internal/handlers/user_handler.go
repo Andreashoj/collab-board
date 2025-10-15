@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"simple-setup/internal/middlewares"
 	"simple-setup/internal/models"
 	"simple-setup/internal/services"
 
@@ -18,9 +19,11 @@ func NewUserHandler(s *services.UserService) *UserHandler {
 
 func (h *UserHandler) RegisterRoutes(r *chi.Mux) {
 	r.Route("/user", func(user chi.Router) {
+		r.Use(middlewares.AuthMiddleware)
+
 		user.Post("/", h.CreateUser)
 		user.Put("/{id}", h.UpdateUser)
-		user.Get("/{id}", h.GetUser)
+		user.Get("/", h.GetUser)
 		user.Delete("/{id}", h.DeleteUser)
 	})
 }
@@ -47,17 +50,10 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
-	id, err := tryGetUintParam("id", r)
+	user, err := middlewares.GetUserFromContext(r.Context())
 
 	if err != nil {
-		respondError(w, err, http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.service.GetUser(id)
-
-	if err != nil {
-		respondError(w, err, http.StatusNotFound)
+		respondError(w, err, http.StatusUnauthorized)
 		return
 	}
 

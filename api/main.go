@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"simple-setup/internal/db"
 	"simple-setup/internal/handlers"
@@ -11,9 +12,20 @@ import (
 	"simple-setup/internal/services"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using system environment variables")
+	}
+
+	// Firebase
+	if err := middlewares.InitFirebase(); err != nil {
+		log.Fatalf("Failed to initialize Firebase: %v", err)
+	}
+
 	// Db
 	database := db.Init()
 

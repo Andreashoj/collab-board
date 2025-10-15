@@ -20,5 +20,5 @@ func Init() *gorm.DB {
 }
 
 func migrate(db *gorm.DB) {
-	db.AutoMigrate(&models.Group{}, &models.User{})
+	db.AutoMigrate(&models.User{})
 }
