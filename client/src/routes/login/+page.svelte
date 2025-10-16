@@ -7,6 +7,12 @@
 	} from 'firebase/auth';
 	import { goto } from '$app/navigation';
 	import { localApi } from '$lib/api/api';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import * as Alert from '$lib/components/ui/alert';
+	import { Separator } from '$lib/components/ui/separator';
 
 	let email = $state('');
 	let password = $state('');
@@ -54,69 +60,70 @@
 	}
 </script>
 
-<div class="flex min-h-screen items-center justify-center">
-	<div class="w-full max-w-md space-y-8 rounded-lg border p-8">
-		<h1 class="text-center text-3xl font-bold">Sign In</h1>
+<div class="flex min-h-screen items-center justify-center p-4">
+	<Card.Root class="w-full max-w-md">
+		<Card.Header>
+			<Card.Title class="text-center text-2xl">Sign In</Card.Title>
+			<Card.Description class="text-center">Enter your credentials to access your account</Card.Description>
+		</Card.Header>
+		<Card.Content class="space-y-6">
+			{#if error}
+				<Alert.Root variant="destructive">
+					<Alert.Description>{error}</Alert.Description>
+				</Alert.Root>
+			{/if}
 
-		{#if error}
-			<div class="rounded bg-red-50 p-4 text-red-800">
-				{error}
+			<form class="space-y-4" onsubmit={(e) => { e.preventDefault(); handleEmailLogin(); }}>
+				<div class="space-y-2">
+					<Label for="email">Email</Label>
+					<Input
+						id="email"
+						type="email"
+						bind:value={email}
+						disabled={loading}
+						placeholder="you@example.com"
+						required
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<Label for="password">Password</Label>
+					<Input
+						id="password"
+						type="password"
+						bind:value={password}
+						disabled={loading}
+						placeholder="••••••••"
+						required
+					/>
+				</div>
+
+				<Button type="submit" class="w-full" disabled={loading}>
+					{loading ? 'Signing in...' : 'Sign In'}
+				</Button>
+			</form>
+
+			<div class="relative">
+				<div class="absolute inset-0 flex items-center">
+					<Separator />
+				</div>
+				<div class="relative flex justify-center text-xs uppercase">
+					<span class="bg-background px-2 text-muted-foreground">Or continue with</span>
+				</div>
 			</div>
-		{/if}
 
-		<form class="space-y-6" onsubmit={(e) => { e.preventDefault(); handleEmailLogin(); }}>
-			<div>
-				<label for="email" class="block text-sm font-medium">Email</label>
-				<input
-					id="email"
-					type="email"
-					bind:value={email}
-					disabled={loading}
-					class="mt-1 w-full rounded border px-3 py-2"
-					required
-				/>
-			</div>
-
-			<div>
-				<label for="password" class="block text-sm font-medium">Password</label>
-				<input
-					id="password"
-					type="password"
-					bind:value={password}
-					disabled={loading}
-					class="mt-1 w-full rounded border px-3 py-2"
-					required
-				/>
-			</div>
-
-			<button
-				type="submit"
+			<Button
+				variant="outline"
+				class="w-full"
+				onclick={handleGoogleLogin}
 				disabled={loading}
-				class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
 			>
-				{loading ? 'Signing in...' : 'Sign In'}
-			</button>
-		</form>
+				Sign in with Google
+			</Button>
 
-		<div class="relative">
-			<div class="absolute inset-0 flex items-center">
-				<div class="w-full border-t"></div>
-			</div>
-			<div class="relative flex justify-center text-sm">
-				<span class="bg-white px-2 text-gray-500">Or continue with</span>
-			</div>
-		</div>
-
-		<button
-			onclick={handleGoogleLogin}
-			disabled={loading}
-			class="w-full rounded border border-gray-300 bg-white px-4 py-2 hover:bg-gray-50 disabled:opacity-50"
-		>
-			Sign in with Google
-		</button>
-
-		<p class="text-center text-sm">
-			Don't have an account? <a href="/signup" class="text-blue-600 hover:underline">Sign up</a>
-		</p>
-	</div>
+			<p class="text-center text-sm text-muted-foreground">
+				Don't have an account? <a href="/signup" class="text-primary hover:underline">Sign up</a>
+			</p>
+		</Card.Content>
+		</Card.Root>
 </div>

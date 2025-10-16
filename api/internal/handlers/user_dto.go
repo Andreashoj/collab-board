@@ -1,17 +1,15 @@
 package handlers
 
 type CreateUserRequest struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Email    string `json:"email"`
+	Password string `json:"password"` // Should be hashed before storing
 }
 
 type UserResponse struct {
-	Id    uint   `json:"id"`
-	Name  string `json:"name"`
+	ID    uint   `json:"id"`
 	Email string `json:"email"`
 }
 
 type UpdateUserRequest struct {
-	Name  string `json:"name"`
 	Email string `json:"email"`
 }

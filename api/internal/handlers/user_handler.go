@@ -10,16 +10,20 @@ import (
 )
 
 type UserHandler struct {
-	service *services.UserService
+	service     *services.UserService
+	authService *middlewares.AuthService
 }
 
-func NewUserHandler(s *services.UserService) *UserHandler {
-	return &UserHandler{service: s}
+func NewUserHandler(s *services.UserService, auth *middlewares.AuthService) *UserHandler {
+	return &UserHandler{
+		service:     s,
+		authService: auth,
+	}
 }
 
 func (h *UserHandler) RegisterRoutes(r *chi.Mux) {
 	r.Route("/user", func(user chi.Router) {
-		r.Use(middlewares.AuthMiddleware)
+		user.Use(h.authService.Middleware)
 
 		user.Post("/", h.CreateUser)
 		user.Put("/{id}", h.UpdateUser)
@@ -37,8 +41,8 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := models.User{
-		Name:  req.Name,
-		Email: req.Email,
+		Email:        req.Email,
+		PasswordHash: req.Password, // Should be hashed
 	}
 
 	if err = h.service.CreateUser(&user); err != nil {
@@ -67,15 +71,14 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := tryGetUintParam("id", r)
+	id, err := tryGetUUIDParam("id", r)
 	if err != nil {
-		respondError(w, err, http.StatusNotFound)
+		respondError(w, err, http.StatusBadRequest)
 		return
 	}
 
 	user := models.User{
 		ID:    id,
-		Name:  req.Name,
 		Email: req.Email,
 	}
 
@@ -89,8 +92,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	id, err := tryGetUintParam("id", r)
-
+	id, err := tryGetUUIDParam("id", r)
 	if err != nil {
 		respondError(w, err, http.StatusBadRequest)
 		return

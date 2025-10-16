@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
 func tryDecodeJSON[T any](body io.ReadCloser) (*T, error) {
@@ -20,13 +20,7 @@ func tryDecodeJSON[T any](body io.ReadCloser) (*T, error) {
 	return &msg, nil
 }
 
-func tryGetUintParam(param string, r *http.Request) (uint, error) {
+func tryGetUUIDParam(param string, r *http.Request) (uuid.UUID, error) {
 	idStr := chi.URLParam(r, param)
-	id, err := strconv.ParseUint(idStr, 10, 64)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return uint(id), nil
+	return uuid.Parse(idStr)
 }

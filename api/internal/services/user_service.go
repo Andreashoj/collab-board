@@ -3,6 +3,8 @@ package services
 import (
 	"simple-setup/internal/models"
 	"simple-setup/internal/repositories"
+
+	"github.com/google/uuid"
 )
 
 type UserService struct {
@@ -17,7 +19,7 @@ func (s *UserService) CreateUser(u *models.User) error {
 	return s.repository.CreateUser(u)
 }
 
-func (s *UserService) GetUser(id uint) (*models.User, error) {
+func (s *UserService) GetUser(id uuid.UUID) (*models.User, error) {
 	user, err := s.repository.GetUserById(id)
 
 	if err != nil {
@@ -31,6 +33,6 @@ func (s *UserService) UpdateUser(user *models.User) error {
 	return s.repository.EditUser(user)
 }
 
-func (s *UserService) DeleteUser(id uint) error {
+func (s *UserService) DeleteUser(id uuid.UUID) error {
 	return s.repository.DeleteUser(id)
 }
